@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 from tqdm import tqdm
 from shapely.geometry import Polygon, Point
 
@@ -83,14 +84,19 @@ dat_files.sort()
 # 分镜头的文件，一般为5个镜头
 txt_files = find_files(project_path, '.txt')
 txt_files.sort()
+txt_files = txt_files[:5]
+print(dat_files)
+print(txt_files)
 
+# todo:写个整体时间统计的代码吧
+start_time = time.time()
 # 先遍历dat文件作为分块依据
 for i, each_dat in enumerate(dat_files):
     # 定义新建文件夹的名字
     name_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
     output_dir = os.path.join(output_path, name_list[i])
     os.makedirs(output_dir, exist_ok=True)
-    for j, each_txt in enumerate(tqdm(txt_files)):
+    for j, each_txt in enumerate(txt_files):
         # 保存txt路径
         output_txt = os.path.join(output_dir, f'{j + 1}.txt')
         # 图片来源路径
@@ -101,3 +107,5 @@ for i, each_dat in enumerate(dat_files):
         os.makedirs(output_img_dir, exist_ok=True)
         # 生成txt并拷贝照片
         generate_txt(each_dat, each_txt, output_txt, source_img_dir, output_img_dir)
+end_time = time.time()
+print("算法总计耗时：", end_time - start_time, '秒')
