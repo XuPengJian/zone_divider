@@ -48,7 +48,7 @@ def generate_txt(dat_path, txt_path, output_txt_path):
     # 获取表头
     head = data_list[0]
     # 先新建output.txt抄一下表头
-    with open(output_path, 'w') as f:
+    with open(output_txt_path, 'w') as f:
         f.write(head)
 
     # 逐行读取剩下的数据
