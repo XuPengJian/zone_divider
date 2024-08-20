@@ -1,11 +1,17 @@
 import os
+import shutil
+from tqdm import tqdm
 from shapely.geometry import Polygon, Point
 
 # 参数输入部分
 project_path = 'example/4'
+# project_path = r'D:\航测数据\14-zhaoqing\4\IMG'
 # txt_path = 'example/5.txt'
 # cad_dat_path = 'example/001.DAT'
 output_path = 'example/output'
+
+
+# output_path = r'D:\航测数据\14-zhaoqing\4\image'
 
 
 def find_files(directory, suffix='.txt'):
@@ -22,7 +28,7 @@ def find_files(directory, suffix='.txt'):
 
 
 # 单个文件生成txt的代码
-def generate_txt(dat_path, txt_path, output_txt_path):
+def generate_txt(dat_path, txt_path, output_txt_path, source_img_dir, output_img_dir):
     # 打开dat文件，读取里面的点信息
     poly_line = []
     with open(dat_path, 'r') as f:
@@ -45,6 +51,7 @@ def generate_txt(dat_path, txt_path, output_txt_path):
         data_list = f.readlines()
 
     # print(data_list)
+    # todo:之后修改输出的数据格式，只保留经纬度和高程数据，并去掉表头
     # 获取表头
     head = data_list[0]
     # 先新建output.txt抄一下表头
@@ -52,7 +59,7 @@ def generate_txt(dat_path, txt_path, output_txt_path):
         f.write(head)
 
     # 逐行读取剩下的数据
-    for i in range(1, len(data_list)):
+    for i in tqdm(range(1, len(data_list))):
         txt_data = data_list[i].split('\t')
         longitude = float(txt_data[1])
         latitude = float(txt_data[2])
@@ -61,10 +68,15 @@ def generate_txt(dat_path, txt_path, output_txt_path):
         # 判断点是否在多边形内部
         is_inside = point.within(polygon)
         if is_inside:
+            # 写入txt
             with open(output_txt_path, 'a') as f:
                 f.write(data_list[i])
+            # 拷贝图片
+            source_img_path = os.path.join(source_img_dir, txt_data[0])
+            output_img_path = os.path.join(output_img_dir, txt_path[0])
+            shutil.copy(source_img_path, output_img_path)
 
-            print('image_name:', txt_data[0])
+            # print('image_name:', txt_data[0])
 
 
 # 分地块的文件
@@ -80,7 +92,14 @@ for i, each_dat in enumerate(dat_files):
     name_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
     output_dir = os.path.join(output_path, name_list[i])
     os.makedirs(output_dir, exist_ok=True)
-    for j, each_txt in enumerate(txt_files):
-        output_txt = os.path.join(output_dir, f'{j + 1}.txt').replace('\\', '/')
-        print(output_txt)
-        generate_txt(each_dat, each_txt, output_txt)
+    for j, each_txt in enumerate(tqdm(txt_files)):
+        # 保存txt路径
+        output_txt = os.path.join(output_dir, f'{j + 1}.txt')
+        # 图片来源路径
+        source_img_dir = os.path.join(project_path, str(j + 1))
+        # 输出图片路径
+        output_img_dir = os.path.join(output_dir, str(j + 1))
+        # 创建储存图片的文件夹
+        os.makedirs(output_img_dir, exist_ok=True)
+        # 生成txt并拷贝照片
+        generate_txt(each_dat, each_txt, output_txt, source_img_dir, output_img_dir)
