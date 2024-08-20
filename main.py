@@ -4,14 +4,12 @@ from tqdm import tqdm
 from shapely.geometry import Polygon, Point
 
 # 参数输入部分
-project_path = 'example/4'
-# project_path = r'D:\航测数据\14-zhaoqing\4\IMG'
+# project_path = 'example/4'
+project_path = r'D:\航测数据\14-zhaoqing\4\IMG'
 # txt_path = 'example/5.txt'
 # cad_dat_path = 'example/001.DAT'
-output_path = 'example/output'
-
-
-# output_path = r'D:\航测数据\14-zhaoqing\4\image'
+# output_path = 'example/output'
+output_path = r'D:\航测数据\14-zhaoqing\4\image'
 
 
 def find_files(directory, suffix='.txt'):
@@ -73,7 +71,7 @@ def generate_txt(dat_path, txt_path, output_txt_path, source_img_dir, output_img
                 f.write(data_list[i])
             # 拷贝图片
             source_img_path = os.path.join(source_img_dir, txt_data[0])
-            output_img_path = os.path.join(output_img_dir, txt_path[0])
+            output_img_path = os.path.join(output_img_dir, txt_data[0])
             shutil.copy(source_img_path, output_img_path)
 
             # print('image_name:', txt_data[0])
